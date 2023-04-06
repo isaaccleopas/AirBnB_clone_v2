@@ -9,27 +9,27 @@ from os.path import exists, basename
 env.hosts = ['54.152.246.245', '54.144.141.32']
 
 def do_deploy(archive_path):
-    """Deploy the archive to the web servers"""
+    """Distributes an archive to the web servers"""
     if not exists(archive_path):
         return False
 
-    file_name = basename(archive_path).split('.')[0]
-
     try:
-        put(archive_path, "/tmp/")
-        run("mkdir -p /data/web_static/releases/{}/".format(file_name))
-        run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-            .format(basename(archive_path), file_name))
-        run("rm /tmp/{}".format(basename(archive_path)))
-        run("mv /data/web_static/releases/{}/web_static/* "
-            "/data/web_static/releases/{}/".format(file_name, file_name))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(file_name))
-        run("rm -rf /data/web_static/current")
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-            .format(file_name))
-        print("New version deployed!")
+        put(archive_path, '/tmp/')
+
+        archive_filename = basename(archive_path)
+        archive_noext = splitext(archive_filename)[0]
+        releases_path = '/data/web_static/releases/{}'.format(archive_noext)
+        run('mkdir -p {}'.format(releases_path))
+        run('tar -xzf /tmp/{} -C {}'.format(archive_filename, releases_path))
+        run('rm /tmp/{}'.format(archive_filename))
+        run('mv {}/web_static/* {}/'.format(releases_path, releases_path))
+        run('rm -rf {}/web_static'.format(releases_path))
+        run('rm -rf /data/web_static/current')
+        run('ln -s {} /data/web_static/current'.format(releases_path))
+
         return True
 
     except Exception as e:
-        print("Deployment failed: {}".format(e))
+        print(e)
         return False
+
