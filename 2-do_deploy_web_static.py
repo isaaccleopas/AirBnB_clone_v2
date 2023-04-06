@@ -1,16 +1,21 @@
 #!/usr/bin/python3
-"""Fabfile to distribute an archive to a web server."""
-
+# Fabfile to distribute an archive to a web server.
 import os.path
-from fabric.api import env, put, run
+from fabric.api import env
+from fabric.api import put
+from fabric.api import run
 
+env.hosts = ["54.160.85.72", "35.175.132.106"]
 
-env.hosts = ['54.152.246.245', '54.144.141.32']
-env.user = 'ubuntu'
-env.key_filename = '/home/vagrant/.ssh/id_rsa'
 
 def do_deploy(archive_path):
-    """Distributes an archive to my web servers"""
+    """Distributes an archive to a web server.
+    Args:
+        archive_path (str): The path of the archive to distribute.
+    Returns:
+        If the file doesn't exist at archive_path or an error occurs - False.
+        Otherwise - True.
+    """
     if os.path.isfile(archive_path) is False:
         return False
     file = archive_path.split("/")[-1]
