@@ -9,7 +9,7 @@ def do_pack():
     """Creates a compressed archive of web_static"""
     if not os.path.exists("versions"):
         os.makedir("versions")
-    timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    timestamp = datetime.utcnow()
     archive_filename = "web_static_{}.tgz".format(timestamp)
     archive_command = "tar -czvf {0} {1}".format(
             os.path.join("versions", archive_filename),
