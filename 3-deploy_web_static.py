@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-# Fabfile to create and distribute an archive to a web server.
+""" Fabfile to create and distribute an archive to a web server."""
+
 import os.path
 from datetime import datetime
 from fabric.api import env
@@ -9,7 +10,6 @@ from fabric.api import run
 
 env.hosts = ['54.152.246.245', '54.144.141.32']
 env.user = 'ubuntu'
-env.key_filename = '/home/vagrant/.ssh/id_rsa'
 
 def do_pack():
     """generates a tgz archive"""
@@ -24,24 +24,33 @@ def do_pack():
         return None
 
 def do_deploy(archive_path):
-    """Deploy a compressed archive to the web servers."""
-    if not exists(archive_path):
-        return False
+    """ distributes an archive to my web servers
+    """
+    if exists(archive_path) is False:
+        return False  # Returns False if the file at archive_path doesnt exist
+    filename = archive_path.split('/')[-1]
+    # so now filename is <web_static_2021041409349.tgz>
+    no_tgz = '/data/web_static/releases/' + "{}".format(filename.split('.')[0])
+    # curr = '/data/web_static/current'
+    tmp = "/tmp/" + filename
+
     try:
-        file_name = archive_path.split("/")[-1]
-        no_ext = file_name.split(".")[0]
         put(archive_path, "/tmp/")
-        run("mkdir -p /data/web_static/releases/{}/".format(no_ext))
-        run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-            .format(file_name, no_ext))
-        run("rm /tmp/{}".format(file_name))
-        run("mv /data/web_static/releases/{}/web_static/* "
-            "/data/web_static/releases/{}/".format(no_ext, no_ext))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(no_ext))
+        # ^ Upload the archive to the /tmp/ directory of the web server
+        run("mkdir -p {}/".format(no_tgz))
+        # Uncompress the archive to the folder /data/web_static/releases/
+        # <archive filename without extension> on the web server
+        run("tar -xzf {} -C {}/".format(tmp, no_tgz))
+        run("rm {}".format(tmp))
+        run("mv {}/web_static/* {}/".format(no_tgz, no_tgz))
+        run("rm -rf {}/web_static".format(no_tgz))
+        # ^ Delete the archive from the web server
         run("rm -rf /data/web_static/current")
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-            .format(no_ext))
-        print("New version deployed!")
+        # Delete the symbolic link /data/web_static/current from the web server
+        run("ln -s {}/ /data/web_static/current".format(no_tgz))
+        # Create a new the symbolic link /data/web_static/current on the
+        # web server, linked to the new version of your code
+        # (/data/web_static/releases/<archive filename without extension>)
         return True
     except:
         return False
