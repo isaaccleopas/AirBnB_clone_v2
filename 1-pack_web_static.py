@@ -8,13 +8,11 @@ from datetime import datetime
 from os.path import isdir
 
 def do_pack():
-    """Generates a tgz archive"""
-    if not isdir("versions"):
+    """Create a tgz archive from the contents of the web_static folder"""
+    if not exists("versions"):
         local("mkdir versions")
-
-    date = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-    file_name = "versions/web_static_{}.tgz".format(date)
-
-    if local("tar -czvf {} web_static".format(file_name)).failed:
+    time_format = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    file_path = "versions/web_static_{}.tgz".format(time_format)
+    if local("tar -czvf {} web_static".format(file_path)).failed:
         return None
-    return file_name
+    return file_path
