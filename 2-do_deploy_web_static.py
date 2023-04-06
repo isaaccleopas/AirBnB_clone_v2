@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 """Fabfile to distribute an archive to a web server."""
 
-from fabric.api import env, put, run, local
-from os.path import exists
+import os.path
+from fabric.api import env, put, run
 
 
 env.hosts = ['54.152.246.245', '54.144.141.32']
@@ -10,24 +10,34 @@ env.user = 'ubuntu'
 env.key_filename = '/home/vagrant/.ssh/id_rsa'
 
 def do_deploy(archive_path):
-    """Deploy a compressed archive to the web servers."""
-    if not exists(archive_path):
+    """Distributes an archive to my web servers"""
+    if os.path.isfile(archive_path) is False:
         return False
-    try:
-        file_name = archive_path.split("/")[-1]
-        no_ext = file_name.split(".")[0]
-        put(archive_path, "/tmp/")
-        run("mkdir -p /data/web_static/releases/{}/".format(no_ext))
-        run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-            .format(file_name, no_ext))
-        run("rm /tmp/{}".format(file_name))
-        run("mv /data/web_static/releases/{}/web_static/* "
-            "/data/web_static/releases/{}/".format(no_ext, no_ext))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(no_ext))
-        run("rm -rf /data/web_static/current")
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-            .format(no_ext))
-        print("New version deployed!")
-        return True
-    except:
+    file = archive_path.split("/")[-1]
+    name = file.split(".")[0]
+
+    if put(archive_path, "/tmp/{}".format(file)).failed is True:
         return False
+    if run("rm -rf /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("mkdir -p /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
+           format(file, name)).failed is True:
+        return False
+    if run("rm /tmp/{}".format(file)).failed is True:
+        return False
+    if run("mv /data/web_static/releases/{}/web_static/* "
+           "/data/web_static/releases/{}/".format(name, name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/releases/{}/web_static".
+           format(name)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/current").failed is True:
+        return False
+    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
+           format(name)).failed is True:
+        return False
+    return True
