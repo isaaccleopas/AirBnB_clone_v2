@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# sets up the web servers for the deployment of web_static
+# sets up web server for deploying web_static
 
-sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get -y install nginx
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared
-echo "This is a test" | sudo tee /data/web_static/releases/test/index.html
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
-sudo chown -hR ubuntu:ubuntu /data/
-sudo sed -i '38i\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' /etc/nginx/sites-available/default
+sudo apt-get update
+sudo apt-get install -y nginx
+
+sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /data/web_static/releases/test/
+echo "Welcome To My Test Page" /data/web_static/releases/test/index.html
+sudo rm -f /data/web_static/current && ln -s /data/web_static/releases/test/ /data/web_static/current
+sudo chown -R ubuntu:ubuntu /data/
+location_block='\tlocation /hbnb_static/ {\n\talias /data/web_static/current/;\n\t}'
+sudo sed -i "/^\s*server\s*{/,/^\s*}/ s|^\s*}$|\n$location_block\n}|" /etc/nginx/sites-available/default
 sudo service nginx start
