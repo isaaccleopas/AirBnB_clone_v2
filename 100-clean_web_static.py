@@ -28,13 +28,16 @@ def do_clean(number=0):
     local('mkdir -p versions')
 
     archives = local('ls -1t versions', capture=True).split('\n')
+    archives_to_delete = archives[number:]
 
-    for i in range(number, len(archives)):
-        local('rm -rf versions/{}'.format(archives[i]))
+    for archive in archives_to_delete:
+        local('rm -rf versions/{}'.format(archive))
 
     run("mkdir -p /data/web_static/releases")
     archives = run("ls -1t /data/web_static/releases").split()
-    for i in range(number, len(archives)):
-        if archives[i] != "test":
-            path = "/data/web_static/releases/{}".format(archives[i])
+    archives_to_delete = archives[number:]
+
+    for archive in archives_to_delete:
+        if archive != "test":
+            path = "/data/web_static/releases/{}".format(archive)
             run("rm -rf {}".format(path))
