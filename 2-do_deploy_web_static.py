@@ -7,6 +7,8 @@ from fabric.api import env, put, run
 from os.path import exists, basename
 
 env.hosts = ['54.152.246.245', '54.144.141.32']
+env.user = 'vagrant'
+env.key_filename = '/home/vagrant/.ssh/id_rsa'
 
 def do_deploy(archive_path):
     """Distributes an archive to the web servers"""
