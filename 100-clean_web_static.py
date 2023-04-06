@@ -1,22 +1,40 @@
-#!/usr/bin/python3
-# Fabfile to delete out-of-date archives.
+#!/usr/bin/env python3
+"""
+This module contains a Fabric script that deletes out-of-date archives.
+"""
+from datetime import datetime
+from fabric.api import env, run, local
 import os
-from fabric.api import *
 
-env.hosts = ["54.152.246.245", "54.144.141.32"]
+
+env.hosts = ['54.152.246.245', '54.144.141.32']
 
 
 def do_clean(number=0):
-    """Delete out-of-date archives."""
-    number = 1 if int(number) == 0 else int(number)
+    """
+    This function deletes out-of-date archives.
 
-    archives = sorted(os.listdir("versions"))
-    [archives.pop() for i in range(number)]
-    with lcd("versions"):
-        [local("rm ./{}".format(a)) for a in archives]
+    Args:
+        number (int): The number of archives to keep.
 
-    with cd("/data/web_static/releases"):
-        archives = run("ls -tr").split()
-        archives = [a for a in archives if "web_static_" in a]
-        [archives.pop() for i in range(number)]
-        [run("rm -rf ./{}".format(a)) for a in archives]
+    Returns:
+        Nothing.
+    """
+    if int(number) < 1:
+        number = 1
+    else:
+        number = int(number)
+
+    local('mkdir -p versions')
+
+    archives = local('ls -1t versions', capture=True).split('\n')
+
+    for i in range(number, len(archives)):
+        local('rm -rf versions/{}'.format(archives[i]))
+
+    run("mkdir -p /data/web_static/releases")
+    archives = run("ls -1t /data/web_static/releases").split()
+    for i in range(number, len(archives)):
+        if archives[i] != "test":
+            path = "/data/web_static/releases/{}".format(archives[i])
+            run("rm -rf {}".format(path))
