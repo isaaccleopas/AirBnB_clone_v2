@@ -1,36 +1,32 @@
 #!/usr/bin/python3
-""" Fabric script (based on the file 1-pack_web_static.py) that distributes..
-    ..an archive to your web servers, using the function do_deploy: """
+"""
+Fabric script to distribute an archive to your web servers
+using the function do_deploy.
+"""
 
+import os
+from fabric.api import *
 
-from fabric.api import put, run, local, env
-from os.path import exists
-
+env.user = 'ubuntu'
 env.hosts = ['54.152.246.245', '54.144.141.32']
 
 def do_deploy(archive_path):
-    if not exists(archive_path):
+    """Distributes an archive to my web servers"""
+    if not os.path.exists(archive_path):
         return False
 
-    try:
-        put(archive_path, '/tmp/')
+    filename = os.path.basename(archive_path)
+    remote_path = "/tmp/{}".format(filename)
+    put(archive_path, remote_path)
 
-        filename = archive_path.split('/')[-1]
-        foldername = '/data/web_static/releases/' + filename[:-4]
-        run('sudo mkdir -p {} && sudo tar -xzf /tmp/{} -C {}'
-            .format(foldername, filename, foldername))
+    foldername = filename.split(".")[0]
+    path = "/data/web_static/releases/{}/".format(foldername)
+    run("mkdir -p {}".format(path))
+    run("tar -xzf {} -C {}".format(remote_path, path))
+    run("rm {}".format(remote_path))
+    run("mv {}web_static/* {}".format(path, path))
+    run("rm -rf {}web_static".format(path))
+    run("rm -f /data/web_static/current")
+    run("ln -s {} /data/web_static/current".format(path))
 
-        run('sudo rm /tmp/{}'.format(filename))
-
-        run('sudo mv {}/web_static/* {}/'.format(foldername, foldername))
-        run('sudo rm -rf {}/web_static'.format(foldername))
-        run('sudo rm -rf /data/web_static/current')
-
-        run('sudo ln -s {} /data/web_static/current'.format(foldername))
-
-        print("New version deployed!")
-        return True
-
-    except Exception as e:
-        print("Error: {}".format(e))
-        return False
+    return True
