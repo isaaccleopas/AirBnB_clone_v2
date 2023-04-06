@@ -9,24 +9,23 @@ env.hosts = ['54.152.246.245', '54.144.141.32']
 env.user = 'ubuntu'
 
 def do_deploy(archive_path):
-    """Deploy a compressed archive to the web servers."""
-    if not exists(archive_path):
-        return False
+    """ distributes an archive to my web servers
+    """
+    if exists(archive_path) is False:
+        return False 
+    filename = archive_path.split('/')[-1]
+    no_tgz = '/data/web_static/releases/' + "{}".format(filename.split('.')[0])
+    tmp = "/tmp/" + filename
+
     try:
-        file_name = archive_path.split("/")[-1]
-        no_ext = file_name.split(".")[0]
         put(archive_path, "/tmp/")
-        run("mkdir -p /data/web_static/releases/{}/".format(no_ext))
-        run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-            .format(file_name, no_ext))
-        run("rm /tmp/{}".format(file_name))
-        run("mv /data/web_static/releases/{}/web_static/* "
-            "/data/web_static/releases/{}/".format(no_ext, no_ext))
-        run("rm -rf /data/web_static/releases/{}/web_static".format(no_ext))
+        run("mkdir -p {}/".format(no_tgz))
+        run("tar -xzf {} -C {}/".format(tmp, no_tgz))
+        run("rm {}".format(tmp))
+        run("mv {}/web_static/* {}/".format(no_tgz, no_tgz))
+        run("rm -rf {}/web_static".format(no_tgz))
         run("rm -rf /data/web_static/current")
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-            .format(no_ext))
-        print("New version deployed!")
+        run("ln -s {}/ /data/web_static/current".format(no_tgz))
         return True
     except:
         return False
