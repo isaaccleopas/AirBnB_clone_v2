@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
 This module contains a Fabric script that deletes out-of-date archives.
 """
+
 from datetime import datetime
 from fabric.api import env, run, local
 import os
