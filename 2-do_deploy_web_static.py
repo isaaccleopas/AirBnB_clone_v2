@@ -7,8 +7,10 @@ using the function do_deploy.
 import os
 from fabric.api import *
 
+
 env.user = 'ubuntu'
 env.hosts = ['54.152.246.245', '54.144.141.32']
+
 
 def do_deploy(archive_path):
     """Distributes an archive to my web servers"""
