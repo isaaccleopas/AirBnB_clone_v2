@@ -1,3 +1,13 @@
+#!/usr/bin/python3
+"""Fabfile to create and distribute an archive to a web server."""
+
+from fabric.api import env, local, put, run
+from datetime import datetime
+from os.path import exists, isdir
+
+env.hosts = ['54.152.246.245', '54.144.141.32']
+
+
 def do_pack():
     """
     Compress files and create a new archive.
