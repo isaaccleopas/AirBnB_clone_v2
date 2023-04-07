@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-"""Fabfile to create and distribute an archive to a web server."""
+"""
+Fabfile to create and distribute an archive to a web server.
+"""
 
 import os
 from fabric.api import env, local, put, run
 from datetime import datetime
-from os.path import exists, isdir
 
 env.hosts = ['54.152.246.245', '54.144.141.32']
 
