@@ -5,9 +5,7 @@ The app listens on 0.0.0.0, port 5000
 Route:
     /: Display "Hello HBNB!"
     /hbnb: Display "HBNB"
-    /c/<text>: display "C " followed by 
-        the value of the text variable
-        (replace underscore _ symbols with a space )
+    /c/<text>: Displays 'C' followed by the value of <text>.
 """
 from flask import Flask
 
@@ -30,7 +28,7 @@ def hbnb():
 def c(text):
     """Displays 'C' followed by the value of <text>."""
     text = text.replace("_", " ")
-    return 'c {}'.format(text)
+    return 'C {}'.format(text)
 
 
 if __name__ == '__main__':
