@@ -23,7 +23,6 @@ association_table = Table("place_amenity", Base.metadata,
                                  ForeignKey("amenities.id"),
                                  primary_key=True, nullable=False))
 
-
 class Place(BaseModel, Base):
     """Represents a Place for a MySQL database.
     Inherits from SQLAlchemy Base and links to the MySQL table places.
@@ -34,7 +33,7 @@ class Place(BaseModel, Base):
         name (sqlalchemy String): The name.
         description (sqlalchemy String): The description.
         number_rooms (sqlalchemy Integer): The number of rooms.
-        number_bathrooms (sqlalchemy Integer): The number of bathrooms.
+        umber_bathrooms (sqlalchemy Integer): The number of bathrooms.
         max_guest (sqlalchemy Integer): The maximum number of guests.
         price_by_night (sqlalchemy Integer): The price by night.
         latitude (sqlalchemy Float): The place's latitude.
