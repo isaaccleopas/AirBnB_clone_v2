@@ -33,7 +33,7 @@ class Place(BaseModel, Base):
         name (sqlalchemy String): The name.
         description (sqlalchemy String): The description.
         number_rooms (sqlalchemy Integer): The number of rooms.
-        umber_bathrooms (sqlalchemy Integer): The number of bathrooms.
+        number_bathrooms (sqlalchemy Integer): The number of bathrooms.
         max_guest (sqlalchemy Integer): The maximum number of guests.
         price_by_night (sqlalchemy Integer): The price by night.
         latitude (sqlalchemy Float): The place's latitude.
